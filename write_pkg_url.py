@@ -1,20 +1,22 @@
-#!/usr/bin/env python3
 
+from __future__ import with_statement
+from __future__ import absolute_import
 from sys import argv, exit
+from io import open
 
 def main():
   if len(argv) != 3:
-    print("Usage: write_url.py filename url")
+    print u"Usage: write_url.py filename url"
     return -2
   if len(argv[2]) >= 255:
-    print("url must be at most 255 characters!")
+    print u"url must be at most 255 characters!"
     return -2
-  with open(argv[1], "r+b") as file:
+  with open(argv[1], u"r+b") as file:
     data = file.read()
-    pos = data.find(bytes([0x78]*256))
+    pos = data.find(str('x'*256))
     file.seek(pos, 0)
-    file.write(argv[2].encode('ascii'))
-    file.write(bytes([0] * (256 - len(argv[2]))))
+    file.write(argv[2].encode(u'ascii'))
+    file.write(str('\0' * (256 - len(argv[2]))))
 
-if __name__ == "__main__":
-  exit(main())
+if __name__ == u"__main__":
+  main()

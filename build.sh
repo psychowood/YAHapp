@@ -6,8 +6,8 @@ if [ "$#" -ne 2 ]; then
 fi
 
 cp loader.rop.bin host/stage1.bin
-python3 preprocess.py exploit.rop.bin host/stage2.bin
-python3 write_pkg_url.py host/stage1.bin "$1"
-python3 write_pkg_url.py host/stage2.bin "$2"
-python3 preprocess.py host/stage1.bin host/payload.js
+python preprocess.py exploit.rop.bin host/stage2.bin
+python write_pkg_url.py host/stage1.bin "$1"
+python write_pkg_url.py host/stage2.bin "$2"
+python preprocess.py host/stage1.bin host/payload.js
 echo "done." >&2
