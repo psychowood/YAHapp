@@ -57,29 +57,44 @@ public class HENprocess {
         debug = debug || (argv.length > 3);
 
         final String operation = argv[0];
+        OutputStream output = null;
 
         try {
             if (operation.equalsIgnoreCase("write_pkg_url")) {
                 final String srcFile = argv[1];
                 final String url = argv[2];
-                writePkgUrl(srcFile, url);
+                byte[] contents = read(srcFile) ;
+                output = new BufferedOutputStream(new FileOutputStream(srcFile));
+                writePkgUrl(contents, output, url);
             } else if (operation.equalsIgnoreCase("preprocess")) {
                 final String uropFile = argv[1];
                 final String outputFile = argv[2];
-                preprocess(uropFile, outputFile);
+                byte[] urop = read(uropFile);
+                output = new BufferedOutputStream(new FileOutputStream(outputFile));
+                boolean isJs = outputFile.endsWith(".js");
+                preprocess(urop, output, isJs);
             } else {
                 throw new Exception("Unsupported operation: " + operation);
             }
         } catch (Exception e) {
             logErr(e);
             System.exit(-2);
+        } finally {
+            if (output != null) {
+                try { output.close(); } catch(Exception e) {}
+            }
         }
 
     }
 
-    private static void preprocess(String uropFile, String filename) throws Exception {
-        byte[] urop = read(uropFile);
-
+    /***
+     * preprocess.py script, does the HENkaku magic. Don't ask.
+     * @param urop the file contents to be mangled
+     * @param output write here the output
+     * @param jsOutput true if it should output the payload.js file
+     * @throws Exception
+     */
+    public static void preprocess(byte[] urop, OutputStream output, boolean jsOutput) throws Exception {
         while (urop.length % 4 != 0) {
             final int N = urop.length;
             urop = Arrays.copyOf(urop, N + 1);
@@ -93,27 +108,14 @@ public class HENprocess {
         int symtab_size = u32(urop, 0x38);
 
         if (csize % 4 != 0) {
-            final String err = "csize % 4 != 0???";
-            logErr(err);
-            throw new Exception(err);
+            throw new Exception("csize % 4 != 0???");
         }
-
-        log(header_size);
-        log(dsize);
-        log(csize);
-        log(reloc_size);
-        log(symtab_size);
 
         int reloc_offset = header_size + dsize + csize;
         int symtab = reloc_offset + reloc_size;
         int strtab = symtab + symtab_size;
 
         int symtab_n = getFloor(symtab_size, 8);
-
-        log(reloc_offset);
-        log(symtab);
-        log(strtab);
-        log(symtab_n);
 
         Map<Integer,String> reloc_map = new HashMap<Integer,String>();
 
@@ -165,7 +167,7 @@ public class HENprocess {
                 err = "unsupported relocation type";
             }
             if (err != null) {
-                logErr("type " + reloc_type + " sym " + reloc_map.get(sym_id) + " offset " + offset);
+                //logErr("type " + reloc_type + " sym " + reloc_map.get(sym_id) + " offset " + offset);
                 throw new Exception(err);
             }
             relocs[relocsIndex] = wk_reloc_type.byteValue();
@@ -180,68 +182,61 @@ public class HENprocess {
             urop_js[y] = val;
         }
 
-        OutputStream output = null;
-        try {
-            output = new BufferedOutputStream(new FileOutputStream(filename));
-            if (filename.endsWith(".js")) {
-                output.write('\n');
-                output.write("payload = [".getBytes());
+        if (jsOutput) {
+            output.write('\n');
+            output.write("payload = [".getBytes());
 
-                for (int x=0; x < urop_js.length; x++) {
-                    output.write(Long.toString(urop_js[x]).getBytes());
-                    if (x!= urop_js.length-1) {
-                        output.write(',');
-                    }
+            for (int x=0; x < urop_js.length; x++) {
+                output.write(Long.toString(urop_js[x]).getBytes());
+                if (x!= urop_js.length-1) {
+                    output.write(',');
                 }
+            }
 
-                output.write("];\n".getBytes());
-                output.write("relocs = [".getBytes());
+            output.write("];\n".getBytes());
+            output.write("relocs = [".getBytes());
 
-                for (int x=0; x < relocs.length; x++) {
-                    output.write(Long.toString(relocs[x]).getBytes());
-                    if (x!= relocs.length-1) {
-                        output.write(',');
-                    }
+            for (int x=0; x < relocs.length; x++) {
+                output.write(Long.toString(relocs[x]).getBytes());
+                if (x!= relocs.length-1) {
+                    output.write(',');
                 }
+            }
 
-                output.write("];\n".getBytes());
-            } else {
-                long pos = 0;
-                byte[] data = ByteBuffer.allocate(4)
-                        .putInt(getFloor(want_len, 4))
+            output.write("];\n".getBytes());
+        } else {
+            long pos = 0;
+            byte[] data = ByteBuffer.allocate(4)
+                    .putInt(getFloor(want_len, 4))
+                    .order(ByteOrder.LITTLE_ENDIAN)
+                    .array();
+            for(int j = data.length; j > 0; j--) {
+                output.write(data[j-1]);
+            }
+            pos = pos + 4;
+
+            for (int x=0; x < urop_js.length; x++) {
+                data = ByteBuffer.allocate(4)
+                        .putInt((int)urop_js[x])
                         .order(ByteOrder.LITTLE_ENDIAN)
                         .array();
                 for(int j = data.length; j > 0; j--) {
                     output.write(data[j-1]);
                 }
                 pos = pos + 4;
-
-                for (int x=0; x < urop_js.length; x++) {
-                    data = ByteBuffer.allocate(4)
-                            .putInt((int)urop_js[x])
-                            .order(ByteOrder.LITTLE_ENDIAN)
-                            .array();
-                    for(int j = data.length; j > 0; j--) {
-                        output.write(data[j-1]);
-                    }
-                    pos = pos + 4;
-                }
-
-                for (int x=0; x < relocs.length; x++) {
-                    data = ByteBuffer.allocate(1)
-                            .put(relocs[x])
-                            .array();
-                    output.write(data);
-                    pos = pos + 1;
-                }
-                while (pos % 4 != 0 ) {
-                    output.write('\0');
-                    pos = pos +1;
-                }
             }
-        }
-        finally {
-            output.close();
+
+            for (int x=0; x < relocs.length; x++) {
+                data = ByteBuffer.allocate(1)
+                        .put(relocs[x])
+                        .array();
+                output.write(data);
+                pos = pos + 1;
+            }
+            while (pos % 4 != 0 ) {
+                output.write('\0');
+                pos = pos +1;
+            }
         }
 
     }
@@ -264,46 +259,47 @@ public class HENprocess {
         return (int) anInt;
     }
 
-    private static void writePkgUrl(String srcFile, String url) {
+    /***
+     * Write the given URL (with lentgh below 255 chars) in the contents array, writing the result
+     * in output
+     * @param contents the byte[] to search for the placeholder
+     * @param output where to write the byte[] with the injected url
+     * @param url the URL to inject
+     * @throws Exception in case of url.length > 255, of placeholder not found or if writing to the output stream fails
+     */
+    private static void writePkgUrl(byte[] contents, OutputStream output, String url) throws Exception {
         if (url.length() >= 255) {
-            log("url must be at most 255 characters!");
-            System.exit(-2);
+            throw new Exception("url must be at most 255 characters!");
         }
 
-        byte[] contents = read(srcFile) ;
         Integer pos = bytesIndexOf(contents,URL_PLACEHOLDER,0);
 
         if (pos < 0) {
-            log("URL placeholder not found!");
-            System.exit(-2);
+            throw  new Exception("URL placeholder not found!");
         }
 
-        log("Writing binary file...");
         try {
-            OutputStream output = null;
-            try {
-                output = new BufferedOutputStream(new FileOutputStream(srcFile));
-                output.write(Arrays.copyOfRange(contents,0,pos));
-                output.write(url.getBytes());
+            output.write(Arrays.copyOfRange(contents,0,pos));
+            output.write(url.getBytes());
 
-                byte[] chars = new byte[256 - url.length()];
-                Arrays.fill(chars, (byte) 0);
-                output.write(chars);
+            byte[] chars = new byte[256 - url.length()];
+            Arrays.fill(chars, (byte) 0);
+            output.write(chars);
 
-                output.write(Arrays.copyOfRange(contents,pos+256,contents.length));
-            }
-            finally {
-                output.close();
-            }
-        }
-        catch(FileNotFoundException ex){
-            log("File not found.");
+            output.write(Arrays.copyOfRange(contents,pos+256,contents.length));
         }
         catch(IOException ex){
-            log(ex);
+            throw  new Exception(ex);
         }
     }
 
+    /**
+     * Searchs for a subarray in a given array, starting from a specific index
+     * @param Source the source array to search in
+     * @param Search the array to look for in Source
+     * @param fromIndex the starting index
+     * @return The Search arrau position in Source, or -1 if not found
+     */
     private static Integer bytesIndexOf(byte[] Source, byte[] Search, int fromIndex) {
         boolean Find = false;
         int i;
@@ -326,45 +322,41 @@ public class HENprocess {
         return  new Integer(i);
     }
 
-    /**
-     Read the given binary file, and return its contents as a byte array.
+    /***
+     * Read the given binary file, and return its contents as a byte array.
+     * @param aInputFileName The filename
+     * @return A byte[] with the file contents
+     * @throws IOException
      */
-    static byte[] read(String aInputFileName){
+    static byte[] read(String aInputFileName) throws IOException{
         File file = new File(aInputFileName);
         byte[] result = null;
-        try {
-            InputStream input =  new BufferedInputStream(new FileInputStream(file));
-            result = readAndClose(input);
-        }
-        catch (FileNotFoundException ex){
-            log(ex);
-        }
+        InputStream input =  new BufferedInputStream(new FileInputStream(file));
+        result = readAndClose(input);
         return result;
     }
 
-    /**
-     Read an input stream, and return it as a byte array.
+    /***
+     * Read an input stream, and return it as a byte array.
+     * @param aInput The InputStream to read
+     * @return A byte[] with the InputStream contents
+     * @throws IOException
      */
-    static byte[] readAndClose(InputStream aInput){
+    static byte[] readAndClose(InputStream aInput) throws IOException {
         byte[] bucket = new byte[32*1024];
         ByteArrayOutputStream result = null;
-        try  {
-            try {
-                result = new ByteArrayOutputStream(bucket.length);
-                int bytesRead = 0;
-                while(bytesRead != -1){
-                    bytesRead = aInput.read(bucket);
-                    if(bytesRead > 0){
-                        result.write(bucket, 0, bytesRead);
-                    }
+        try {
+            result = new ByteArrayOutputStream(bucket.length);
+            int bytesRead = 0;
+            while(bytesRead != -1){
+                bytesRead = aInput.read(bucket);
+                if(bytesRead > 0){
+                    result.write(bucket, 0, bytesRead);
                 }
             }
-            finally {
-                aInput.close();
-            }
         }
-        catch (IOException ex){
-            log(ex);
+        finally {
+            aInput.close();
         }
         return result.toByteArray();
     }
