@@ -4,7 +4,8 @@ You need to host two things: the first stage ROP and the second stage dynamic RO
 
 ## Requirements
 
-* Python 3 (and the `python3` command)
+* Python 2 (and the `python` command)
+* Java > 1.6 (and both the `javac` and the `java` command)
 * (Optional) PHP
 * (Optional) Go
 
@@ -21,6 +22,13 @@ For example, if my server is at `192.168.1.100` and I run a web server on port 8
 ```shell
 ./build.sh http://192.168.1.100:4000/ http://192.168.1.100:8888/pkg
 ```
+
+or, for the java version
+
+```shell
+./build-java.sh http://192.168.1.100:4000/ http://192.168.1.100:8888/pkg
+```
+
 
 The built files will be in the `./host` directory.
 
