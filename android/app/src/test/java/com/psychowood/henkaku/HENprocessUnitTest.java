@@ -14,24 +14,31 @@ import java.io.OutputStream;
 public class HENprocessUnitTest {
     @Test
     public void runBuildScript() throws Exception {
-        String root = "/Users/gg/dev/github/henkaku/"; //Set to repository root
+        final String repositoryRoot = "/Users/gg/dev/github/henkaku/"; //Set to repository repositoryRoot
 
-        copyFile(root+"loader.rop.bin",root+"host/stage1.bin"); //Needed for Step 2
+        final String stage1Url = "http://site.domain:1234/";
+        final String stage2Url = "http://othersite.mydomain:8000/pkg";
+
+        final String exploitBinPath = "exploit.rop.bin";
+        final String stage2BinPath = "host/stage2.bin";
+        final String stage1BinPath = "host/stage1.bin";
+        final String payloadJsPath = "host/payload.js";
 
         String[] argv;
 
-        argv = new String[] {"preprocess",root+"exploit.rop.bin",root+"host/stage2.bin"}; //Step 1
+        copyFile(repositoryRoot+"loader.rop.bin",repositoryRoot+ stage1BinPath); //Needed for Step 2
+
+        argv = new String[] {"preprocess",repositoryRoot+ exploitBinPath,repositoryRoot+ stage2BinPath}; //Step 1
         HENprocess.main(argv);
 
-        argv = new String[] {"write_pkg_url",root+"host/stage1.bin","http://site.domain:1234/"}; //Step 2
+        argv = new String[] {"write_pkg_url",repositoryRoot+ stage1BinPath, stage1Url}; //Step 2
         HENprocess.main(argv);
 
-        argv = new String[] {"write_pkg_url",root+"host/stage2.bin","http://othersite.mydomain:8000/pkg"}; //Step 3
+        argv = new String[] {"write_pkg_url",repositoryRoot+ stage2BinPath, stage2Url}; //Step 3
         HENprocess.main(argv);
 
-        argv = new String[] {"preprocess",root+"host/stage1.bin",root+"host/payload.js"}; //Step 4
+        argv = new String[] {"preprocess",repositoryRoot+ stage1BinPath,repositoryRoot+ payloadJsPath}; //Step 4
         HENprocess.main(argv);
-
     }
 
     private static void copyFile(String source, String dest) throws IOException {
