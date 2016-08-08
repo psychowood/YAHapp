@@ -5,17 +5,16 @@ import java.io.BufferedOutputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
+import java.util.AbstractMap.SimpleEntry;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.AbstractMap.SimpleEntry;
 
 
 /***
@@ -58,6 +57,7 @@ public class HENprocess {
 
         final String operation = argv[0];
         OutputStream output = null;
+        InputStream input = null;
 
         try {
             if (operation.equalsIgnoreCase("write_pkg_url")) {
@@ -69,10 +69,10 @@ public class HENprocess {
             } else if (operation.equalsIgnoreCase("preprocess")) {
                 final String uropFile = argv[1];
                 final String outputFile = argv[2];
-                byte[] urop = read(uropFile);
+                input =  new BufferedInputStream(new FileInputStream(uropFile));
                 output = new BufferedOutputStream(new FileOutputStream(outputFile));
                 boolean isJs = outputFile.endsWith(".js");
-                preprocess(urop, output, isJs);
+                preprocess(input, output, isJs);
             } else {
                 throw new Exception("Unsupported operation: " + operation);
             }
@@ -83,18 +83,22 @@ public class HENprocess {
             if (output != null) {
                 try { output.close(); } catch(Exception e) {}
             }
+            if (input!= null) {
+                try { input.close(); } catch(Exception e) {}
+            }
         }
 
     }
 
     /***
      * preprocess.py script, does the HENkaku magic. Don't ask.
-     * @param urop the file contents to be mangled
+     * @param inputStream the InputStream with the contents to be mangled. the stream will be closed
      * @param output write here the output
      * @param jsOutput true if it should output the payload.js file
      * @throws Exception
      */
-    public static void preprocess(byte[] urop, OutputStream output, boolean jsOutput) throws Exception {
+    public static void preprocess(InputStream inputStream, OutputStream output, boolean jsOutput) throws Exception {
+        byte[] urop = readAndClose(inputStream);
         while (urop.length % 4 != 0) {
             final int N = urop.length;
             urop = Arrays.copyOf(urop, N + 1);
@@ -262,10 +266,18 @@ public class HENprocess {
     /***
      * Write the given URL (with lentgh below 255 chars) in the contents array, writing the result
      * in output
-     * @param contents the byte[] to search for the placeholder
+     * @param source the InputStream to search for the placeholder
      * @param output where to write the byte[] with the injected url
      * @param url the URL to inject
      * @throws Exception in case of url.length > 255, of placeholder not found or if writing to the output stream fails
+     */
+    public static void writePkgUrl(InputStream source, OutputStream output, String url) throws Exception {
+        byte[] contents = readAndClose(source);
+        writePkgUrl(contents,output,url);
+    }
+
+    /***
+     * @see private static void writePkgUrl(InputStream source, OutputStream output, String url) throws Exception
      */
     private static void writePkgUrl(byte[] contents, OutputStream output, String url) throws Exception {
         if (url.length() >= 255) {
@@ -342,7 +354,7 @@ public class HENprocess {
      * @return A byte[] with the InputStream contents
      * @throws IOException
      */
-    static byte[] readAndClose(InputStream aInput) throws IOException {
+    public static byte[] readAndClose(InputStream aInput) throws IOException {
         byte[] bucket = new byte[32*1024];
         ByteArrayOutputStream result = null;
         try {
