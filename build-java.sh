@@ -5,14 +5,15 @@ if [ "$#" -ne 2 ]; then
   exit 1
 fi
 
-javac HENprocess.java -Xlint:unchecked
+mkdir tmp
+javac android/app/src/main/java/com/psychowood/henkaku/HENprocess.java -d tmp
 cp loader.rop.bin host/stage1.bin
 
-java HENprocess preprocess exploit.rop.bin host/stage2.bin
-java HENprocess write_pkg_url host/stage1.bin "$1"
-java HENprocess write_pkg_url host/stage2.bin "$2"
-java HENprocess preprocess host/stage1.bin host/payload.js
+java -cp tmp com.psychowood.henkaku.HENprocess preprocess exploit.rop.bin host/stage2.bin
+java -cp tmp com.psychowood.henkaku.HENprocess write_pkg_url host/stage1.bin "$1"
+java -cp tmp com.psychowood.henkaku.HENprocess write_pkg_url host/stage2.bin "$2"
+java -cp tmp com.psychowood.henkaku.HENprocess preprocess host/stage1.bin host/payload.js
 
-rm HENprocess.class
+rm -R tmp
 
 echo "done." >&2
