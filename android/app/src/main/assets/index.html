@@ -1,0 +1,63 @@
+
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <title>HENkaku</title>
+    <meta name="description" content="The revolution is here. Unlock your Vita and run unofficial games and  applications.">
+    <link rel="stylesheet" href="site/main.css">
+</head>
+
+<body>
+
+<div class="modal fade" id="install" tabindex="-1" role="dialog" aria-labelledby="installLabel">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                <h4 class="modal-title" id="installLabel">Install</h4>
+            </div>
+            <div class="modal-body" id="installText">
+            </div>
+            <div class="modal-footer">
+                <a href="#" type="button" class="btn btn-default" data-dismiss="modal" id="cancelBtn">Cancel</a>
+                <a href="stage1/exploit.html" class="btn btn-primary" id="installBtn">Install</a>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<div class="container">
+    <div class="jumbotron">
+        <h1>HENkaku 変革</h1>
+        <p>The revolution is here. Unlock your Vita and run unofficial games and applications.</p>
+        <p><a id="installstart" class="btn btn-primary btn-lg" onclick="javascript:setupInstall();" data-toggle="modal" data-target="#install">Install</a></p>
+    </div>
+    <h1 id="what-is-henkaku">What is HENkaku?</h1>
+    <p>If you're here, you should really know what HENkaku is. :) If you really don't, please read all the informations  and copyrights <a href="http://henkaku.github.io" target="_new">at the official homepage</a> before doing anything rush.</p>
+    <p>Also, please remember: <b>your warranty is now void. I am not responsible for bricked devices, dead memory cards, thermonuclear war, or you getting fired or banned from the PSN because the alarm app failed. </b></p>
+    <p class="text-danger">It is important that you never update your Vita past 3.60 if you ever wish to use HENkaku now or in the future. If you do update, all your installed homebrew will no longer work and you cannot install any homebrew in the future.</p>
+
+    <footer class="site-footer">
+        <div class="row">
+            <div class="col-lg-12">
+                <p>HENkaku is not affiliated, sponsored, or otherwise endorsed by Sony Interactive Entertainment, LLC. PlayStation, PS Vita, and PSTV are trademarks or registered trademarks of Sony Interactive Entertainment, LLC. This software is provided "as is" without warranty of any kind under the <a href="https://github.com/henkaku/henkaku/blob/master/LICENSE">MIT License</a>.</p>
+                <p>Theme by <a href="http://thomaspark.co" rel="nofollow">Thomas Park</a>. Contact him at <a href="thomas@bootswatch.com">thomas@bootswatch.com</a>. Code released under the <a href="https://github.com/thomaspark/bootswatch/blob/gh-pages/LICENSE">MIT License</a>.</p>
+                <p>Based on <a href="http://getbootstrap.com" rel="nofollow">Bootstrap</a>. Icons from <a href="http://fortawesome.github.io/Font-Awesome/" rel="nofollow">Font Awesome</a>. Web fonts from <a href="http://www.google.com/webfonts" rel="nofollow">Google</a>.</p>
+                <p>App packaged by <a href="http://github.com/psychowood/">psychowood</a>.
+            </div>
+        </div>
+    </footer>
+
+</div>
+
+<script src="site/jquery.min.js"></script>
+<script src="site/bootstrap.min.js"></script>
+<script src="site/install.js"></script>
+
+</html>
