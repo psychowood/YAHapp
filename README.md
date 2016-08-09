@@ -1,49 +1,37 @@
-# HENkaku Offline
+# HENkaku Offline (Java port)
 
-You need to host two things: the first stage ROP and the second stage dynamic ROP. The first stage is just static HTML/JS and can be hosted using any means. The second stage must run our custom server. We provided a PHP and Go implementation (Go is recommended as it can handle ~1000x more requests per second).
+You need to host two things: the first stage ROP and the second stage dynamic ROP.
+The provided Java implementation is useful for single-user use, since it is not highly performing (not as the Go implementation provided in the original henkaku repository).
 
 ## Requirements
 
-* Python 2 (and the `python` command)
 * Java > 1.6 (and both the `javac` and the `java` command)
-* (Optional) PHP
-* (Optional) Go
 
-## Building
+## Serving
 
-`YOUR_STAGE_2_URL` will point to where you are hosting stage 2 (must end with a / if you're using the Go server and must point to stage2.php if you're using PHP) and `YOUR_PKG_PREFIX_URL` will point to where you host the molecularShell package (we put it on the same static server as the first stage exploit files). Both URLs have a 255 character limit. Then call
+Just call
 
 ```shell
-./build.sh YOUR_STAGE_2_URL YOUR_PKG_PREFIX_URL
+./serve.sh webserver-port
 ```
 
-For example, if my server is at `192.168.1.100` and I run a web server on port 8888 serving the exploit files along with `pkg` and I run the stage 2 Go server on port 4000, then I would run
+and use the Browser app on the Vita to navigate to the address shown in the console, then tap on Install.
 
-```shell
-./build.sh http://192.168.1.100:4000/ http://192.168.1.100:8888/pkg
-```
+The webserver port is optional, and defaults to 8357
 
-or, for the java version
+Temporary files are put in the `tmp` directory, removed after running.
 
-```shell
-./build-java.sh http://192.168.1.100:4000/ http://192.168.1.100:8888/pkg
-```
+Credits
+--------
+
+Based on [HENkaku offline](https://github.com/henkaku/henkaku) by Yifan Lu
+
+Runs off [NanoHTTPD](https://github.com/NanoHttpd/nanohttpd)
+
+Also thanks to [codestation](https://github.com/codestation) for a working stage2 patcher implementation in java.
 
 
-The built files will be in the `./host` directory.
+License
+-------
 
-## Running
-
-Your stage 1 server can be any web server (Apache for example). For simplicity, you can run the following Python command to start a server at the current directory on port 8888
-
-```shell
-python -m SimpleHTTPServer 8888
-```
-
-Your stage 2 server can either be run as the PHP file (in that case `YOUR_STAGE_2_URL` would point to the PHP script) or as the Go server (your `YOUR_STAGE_2_URL` would point to the right port number). As an example, to run the Go server on port 4000, you can run
-
-```shell
-go run stage2.go -payload stage2.bin -port 4000
-```
-
-You can then visit `http://192.168.1.100:8888/exploit.html` to start the installation.
+**HENkaku Server** is licensed under the [Apache License 2.0](http://www.apache.org/licenses/LICENSE-2.0).

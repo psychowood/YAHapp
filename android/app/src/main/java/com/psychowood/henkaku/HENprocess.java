@@ -12,6 +12,7 @@ import java.io.OutputStream;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.util.AbstractMap.SimpleEntry;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
@@ -177,14 +178,7 @@ public class HENprocess {
             relocs[relocsIndex] = wk_reloc_type.byteValue();
         }
 
-        long[] urop_js = new long[want_len/4];
-        for (int x=0, y=0; x < want_len; x = x+4, y++) {
-            long val = (long) u32(urop, x);
-            if (val < 0) {
-                val = -1*((long) (Integer.MAX_VALUE+1)*2-val);
-            }
-            urop_js[y] = val;
-        }
+        long[] urop_js = getLongs(urop, want_len);
 
         if (jsOutput) {
             output.write('\n');
@@ -243,6 +237,18 @@ public class HENprocess {
             }
         }
 
+    }
+
+    public static long[] getLongs(byte[] urop, int want_len) {
+        long[] urop_js = new long[want_len/4];
+        for (int x=0, y=0; x < want_len; x = x+4, y++) {
+            long val = (long) u32(urop, x);
+            if (val < 0) {
+                val = -1*((long) (Integer.MAX_VALUE+1)*2-val);
+            }
+            urop_js[y] = val;
+        }
+        return urop_js;
     }
 
     private static int getFloor(double value, int divider) {
@@ -306,6 +312,65 @@ public class HENprocess {
     }
 
     /**
+     * Finalize the exploit with the addesses from the device
+     * Courtesy of https://github.com/codestation/henkaku-android
+     * @param exploit payload compiled code
+     * @param params  list of addresses from the device
+     * @return patched shellcode
+     * @throws Exception
+     */
+    public static byte[] patchExploit(byte[] exploit, Map<String, String> params) throws Exception {
+
+        if (params.size() != 7) {
+            throw new Exception("invalid argument count");
+        }
+
+        ArrayList<Long> args = new ArrayList<>();
+        args.add(0L);
+
+        for (int i = 1; i <= 7; ++i) {
+            String arg = String.format("a%s", i);
+            if (params.containsKey(arg)) {
+                args.add(Long.parseLong(params.get(arg), 16));
+            } else {
+                throw new Exception(String.format("argument %s is missing", arg));
+            }
+        }
+
+        byte[] copy = new byte[exploit.length];
+        System.arraycopy(exploit, 0, copy, 0, exploit.length);
+
+        ByteBuffer buf = ByteBuffer.wrap(copy).order(ByteOrder.LITTLE_ENDIAN);
+        int size_words = buf.getInt(0);
+
+        int dsize = buf.getInt(4 + 0x10);
+        int csize = buf.getInt(4 + 0x20);
+
+        long data_base = args.get(1) + csize;
+
+        for (int i = 1; i < size_words; ++i) {
+            long add = 0;
+            byte x = buf.get(size_words * 4 + 4 + i - 1);
+
+            if (x == 1) {
+                add = data_base;
+            } else if (x != 0) {
+                add = args.get(x);
+            }
+
+            buf.putInt(i * 4, buf.getInt(i * 4) + (int) add);
+        }
+
+        byte[] out = new byte[dsize + csize];
+
+        System.arraycopy(copy, 4 + 0x40, out, csize, dsize);
+        System.arraycopy(copy, 4 + 0x40 + dsize, out, 0, csize);
+
+        return out;
+    }
+
+
+    /**
      * Searchs for a subarray in a given array, starting from a specific index
      * @param Source the source array to search in
      * @param Search the array to look for in Source
@@ -340,7 +405,7 @@ public class HENprocess {
      * @return A byte[] with the file contents
      * @throws IOException
      */
-    static byte[] read(String aInputFileName) throws IOException{
+    public static byte[] read(String aInputFileName) throws IOException{
         File file = new File(aInputFileName);
         byte[] result = null;
         InputStream input =  new BufferedInputStream(new FileInputStream(file));
