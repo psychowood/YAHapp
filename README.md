@@ -19,8 +19,6 @@ and use the Browser app on the Vita to navigate to the address shown in the cons
 
 The webserver port is optional, and defaults to 8357
 
-Temporary files are put in the `tmp` directory, removed after running.
-
 Credits
 --------
 
@@ -34,4 +32,4 @@ Also thanks to [codestation](https://github.com/codestation) for a working stage
 License
 -------
 
-**HENkaku Server** is licensed under the [Apache License 2.0](http://www.apache.org/licenses/LICENSE-2.0).
+The project is licensed under the [Apache License 2.0](http://www.apache.org/licenses/LICENSE-2.0).
