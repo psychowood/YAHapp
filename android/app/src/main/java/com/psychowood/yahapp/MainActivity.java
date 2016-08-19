@@ -4,6 +4,7 @@ import android.app.Activity;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
@@ -93,8 +94,16 @@ public class MainActivity extends AppCompatActivity implements MainCardAdapter.M
                 message.setText(s);
                 message.setMovementMethod(LinkMovementMethod.getInstance());
 
+                final String packageName = getApplicationContext().getPackageName();
+                String version;
+                try {
+                    version = getPackageManager().getPackageInfo(packageName,0).versionName;
+                } catch (PackageManager.NameNotFoundException e) {
+                    Log.e(TAG,"Cannot get package name",e);
+                    version = "";
+                }
                 new AlertDialog.Builder(this)
-                        .setTitle(R.string.about_title)
+                        .setTitle(getString(R.string.about_title) + " " + version)
                         .setCancelable(true)
                         .setPositiveButton(android.R.string.ok, null)
                         .setView(message)
