@@ -1,0 +1,24 @@
+<resources>
+    <string name="app_name">YAHapp</string>
+    <string name="activity_henkaku_server">YAHapp - HENkaku 変革 Webserver</string>
+    <string name="app_name_extended">Yet another HENkaku app</string>
+
+    <string name="goodbye">I\'m done. Bye.</string>
+
+    <string name="connectAtTheseAddresses">Please connect to one of these addresses: </string>
+    <string name="connectAtThisAddress">Please connect at this address: </string>
+    <string name="noNetworkAccess">Network access not available!</string>
+    <string name="errorStartingServer">Error starting server: </string>
+    <string name="action_settings">Settings</string>
+
+    <string name="menu_henkaku">HENkaku 変革</string>
+    <string name="menu_henkaku_action">Start server</string>
+
+    <string name="serving">Serving...</string>
+    <string name="install_completed">Installation completed!</string>
+    <string name="enjoy">Enjoy!</string>
+
+    <string name="menu_installvdk">Install VDK</string>
+    <string name="menu_installvdk_action">Select file</string>
+
+</resources>
