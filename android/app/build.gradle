@@ -5,12 +5,20 @@ android {
     compileSdkVersion 24
     buildToolsVersion "24.0.0"
 
+    def Properties versionProps = new Properties()
+    def versionPropsFile = file('build.properties')
+    if(versionPropsFile.exists())
+        versionProps.load(new FileInputStream(versionPropsFile))
+    def code = (versionProps['VERSION_CODE'] ?: "0").toInteger() + 1
+    versionProps['VERSION_CODE'] = code.toString()
+    versionProps.store(versionPropsFile.newWriter(), null)
+
     defaultConfig {
         applicationId "com.psychowood.yahapp"
         minSdkVersion 15
         targetSdkVersion 24
-        versionCode 1
-        versionName "0.0001"
+        versionCode code
+        versionName "0.0." + code.toString()
     }
     buildTypes {
         release {
