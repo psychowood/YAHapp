@@ -210,7 +210,14 @@ public class HenkakuWebServer extends NanoHTTPD {
 
         handler.log(TAG,"Serving: " + resPath);
         if (resInputStream != null) {
-            if (resPath.endsWith(LAST_FILE)) {}
+            if (resPath.endsWith(LAST_FILE)) {
+                new Thread(new Runnable() {
+                    @Override
+                    public void run() {
+                        handler.done();
+                    }
+                }).start();
+            }
             return NanoHTTPD.newChunkedResponse(Response.Status.OK, resMimeType, resInputStream);
         } else {
             final String html = "<html><head><head><body><h1>Sorry, something went wrong</h1><p></p></body></html>";
