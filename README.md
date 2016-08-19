@@ -1,13 +1,32 @@
-# HENkaku Offline (Java port)
+# YAHapp
+
+What started as a simple java CLI port of HENkaku offline (still available [here](https://github.com/psychowood/YAHapp/tree/offline-hosting)), is now trying to evolve in a PS Vita (HEHkaku enabled) companion app.
+
+Current features:
+
+* HENkaku server
+
+That's it! :) 
+It's just the first commit: other features are coming soon, in the meanwhile if you have any idea feel free to add an enhancement request in the [issues board](https://github.com/psychowood/YAHapp/issues).
+
+
+## Disclaimer
+
+This is my very first Android project, please be forgiving. I'll try to polish it while going on with the development.
+Also, I'm testing it on my Nexus w/ Android 6.0 and on the Android simulator: if you have an issue don't forget to give details on your device and androd version.
+
+# EXTRAS
+
+## HENkaku Offline (Java port)
 
 You need to host two things: the first stage ROP and the second stage dynamic ROP.
 The provided Java implementation is useful for single-user use, since it is not highly performing (not as the Go implementation provided in the original henkaku repository).
 
-## Requirements
+### Requirements
 
 * Java > 1.6 (and both the `javac` and the `java` command)
 
-## Serving
+### Serving
 
 Just call
 
