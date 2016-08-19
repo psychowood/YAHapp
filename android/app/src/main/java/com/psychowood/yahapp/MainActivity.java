@@ -2,18 +2,24 @@ package com.psychowood.yahapp;
 
 import android.app.Activity;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
+import android.text.SpannableString;
+import android.text.method.LinkMovementMethod;
+import android.text.util.Linkify;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import java.util.ArrayList;
@@ -64,7 +70,7 @@ public class MainActivity extends AppCompatActivity implements MainCardAdapter.M
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
-        //getMenuInflater().inflate(R.menu.menu_scrolling, menu);
+        getMenuInflater().inflate(R.menu.menu_scrolling, menu);
         return true;
     }
 
@@ -76,8 +82,25 @@ public class MainActivity extends AppCompatActivity implements MainCardAdapter.M
         int id = item.getItemId();
 
         //noinspection SimplifiableIfStatement
-        if (id == R.id.action_settings) {
-            return true;
+        switch (id) {
+            case R.id.action_about: {
+
+                final TextView message = new TextView(this);
+                message.setPadding(25,25,25,25);
+                final SpannableString s =
+                        new SpannableString(this.getText(R.string.about_text));
+                Linkify.addLinks(s, Linkify.WEB_URLS);
+                message.setText(s);
+                message.setMovementMethod(LinkMovementMethod.getInstance());
+
+                new AlertDialog.Builder(this)
+                        .setTitle(R.string.about_title)
+                        .setCancelable(true)
+                        .setPositiveButton(android.R.string.ok, null)
+                        .setView(message)
+                        .create().show();
+                break;
+            }
         }
         return super.onOptionsItemSelected(item);
     }
