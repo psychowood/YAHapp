@@ -26,7 +26,7 @@ import java.util.Map;
  * Seems to be giving the very same results (identical files) of the original scripts.
  *
  * @author: psychowood
- * @see <a href="https://github.com/psychowood/henkaku">https://github.com/psychowood/henkaku</a>
+ * @see <a href="https://github.com/psychowood/henkaku-java">https://github.com/psychowood/henkaku-java</a>
  */
 public class HENprocess {
 
