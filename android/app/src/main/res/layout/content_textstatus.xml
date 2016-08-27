@@ -22,4 +22,25 @@
         android:layout_alignParentStart="true"
         android:scrollbars="vertical"/>
 
+    <ImageView
+        android:layout_width="150dp"
+        android:layout_height="150dp"
+        app:srcCompat="@mipmap/logo"
+        android:layout_centerVertical="true"
+        android:layout_centerHorizontal="true"
+        android:id="@+id/statusImageView"
+        android:visibility="invisible" />
+
+    <TextView
+        android:layout_width="150dp"
+        android:layout_height="wrap_content"
+        android:textAlignment="center"
+        android:id="@+id/statusMessage"
+        android:visibility="invisible"
+        android:layout_centerHorizontal="true"
+        android:layout_below="@+id/statusImageView"
+        android:background="@color/colorMainCardBackground"
+        android:textColor="@color/colorAccent"
+        />
+
 </RelativeLayout>

@@ -24,14 +24,12 @@ public class HenkakuWebServerActivity extends TextStatusActivityBase {
     private static final String ASSETS_PREFIX      = "henkaku/";
 
     private HenkakuWebServer server;
-    private Activity me;
 
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
-        me = this;
     }
 
     @Override
