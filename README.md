@@ -5,6 +5,7 @@ What started as a simple java CLI port of HENkaku offline (still available [here
 Current features:
 
 * HENkaku server
+* Upload a vpk directly to your PSVita (share the .vpk file with YAHapp)
 
 That's it! :) 
 It's just the first commit: other features are coming soon, in the meanwhile if you have any idea feel free to add an enhancement request in the [issues board](https://github.com/psychowood/YAHapp/issues).
@@ -41,11 +42,10 @@ The webserver port is optional, and defaults to 8357
 Credits
 --------
 
-Based on [HENkaku offline](https://github.com/henkaku/henkaku) by Yifan Lu
-
-Runs off [NanoHTTPD](https://github.com/NanoHttpd/nanohttpd)
-
-Also thanks to [codestation](https://github.com/codestation) for a working stage2 patcher implementation in java.
+* Obviously [HENkaku offline](https://github.com/henkaku/henkaku) by Yifan Lu
+* HENkaku server runs off [NanoHTTPD](https://github.com/NanoHttpd/nanohttpd)
+* Reading param.sfo (for vpk validation) with [TiMESPLiNTER's sfo4j](https://github.com/TiMESPLiNTER/sfo4j) 
+* Also thanks to [codestation](https://github.com/codestation) for a working stage2 patcher implementation in java.
 
 
 License
