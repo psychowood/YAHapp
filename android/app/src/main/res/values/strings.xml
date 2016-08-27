@@ -1,6 +1,8 @@
 <resources>
     <string name="app_name">YAHapp</string>
     <string name="activity_henkaku_server">YAHapp - HENkaku 変革 Webserver</string>
+    <string name="activity_ftp_client">YAHapp - Upload to PSVita</string>
+
     <string name="app_name_extended">Yet another HENkaku app</string>
 
     <string name="goodbye">I\'m done. Bye.</string>
@@ -22,6 +24,14 @@
     <string name="enjoy">Enjoy!</string>
 
     <string name="menu_installvdk">Install VDK</string>
-    <string name="menu_installvdk_action">Select file</string>
+    <string name="menu_installvdk_action">Upload .vdk file</string>
+    <string name="menu_installvdk_completed">Upload completed!</string>
+    <string name="menu_installvdk_enter_psvita_ip">Enter PSVita ip:</string>
+    <string name="menu_installvdk_help">To upload a .vpk file to VitaShell\'s ftp server, you need to share a .vpk file with YAHapp using the share action from a file manager app.</string>
+
+    <string name="error">Error!</string>
+    <string name="error_vpk_cant_read">"Cannot load vpk: "</string>
+    <string name="error_permission_storage_denied">Permission to access storage denied</string>
+    <string name="error_invalid_address">Ip address not valid</string>
 
 </resources>

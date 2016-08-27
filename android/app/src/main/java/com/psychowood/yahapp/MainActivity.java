@@ -65,7 +65,7 @@ public class MainActivity extends AppCompatActivity implements MainCardAdapter.M
     private void initializeCardList(){
         mainCards = new ArrayList<>();
         mainCards.add(new MainCard(R.string.menu_henkaku, getString(R.string.menu_henkaku), getString(R.string.menu_henkaku_action)));
-        //mainCards.add(new MainCard(R.string.menu_installvdk, getString(R.string.menu_installvdk), getString(R.string.menu_installvdk_action)));
+        mainCards.add(new MainCard(R.string.menu_installvdk, getString(R.string.menu_installvdk), getString(R.string.menu_installvdk_action)));
     }
 
     @Override
@@ -119,13 +119,21 @@ public class MainActivity extends AppCompatActivity implements MainCardAdapter.M
         MainCard card = mainCards.get(position);
         Log.d(TAG,"clicked " + position);
 
-        final Class<? extends Activity> activityClass;
+        Class<? extends Activity> activityClass = null;
 
         int activityId = mainCards.get(position).id;
 
         switch (activityId) {
             case R.string.menu_henkaku:
                 activityClass = HenkakuWebServerActivity.class;
+                break;
+            case R.string.menu_installvdk:
+                //activityClass = FtpClientActivity.class;
+                new AlertDialog.Builder(this)
+                        .setTitle(getString(R.string.menu_installvdk))
+                        .setMessage(getString(R.string.menu_installvdk_help))
+                        .setPositiveButton(android.R.string.ok, null)
+                        .show();
                 break;
             default:
                 activityClass = null;
@@ -134,10 +142,7 @@ public class MainActivity extends AppCompatActivity implements MainCardAdapter.M
         if (activityClass != null) {
             final Intent intent = new Intent(main, activityClass);
             context.startActivity(intent);
-        } else {
-            Toast.makeText(context, "Action not supported (yet?)", Toast.LENGTH_SHORT).show();
         }
-
     }
 
     @Override
