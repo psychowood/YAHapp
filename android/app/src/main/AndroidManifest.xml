@@ -29,6 +29,21 @@
             android:name=".FtpClientActivity"
             android:label="@string/activity_ftp_client"
             android:theme="@style/AppTheme.NoActionBar">
+            <!-- intent-filter android:priority="1">
+                <action android:name="android.intent.action.VIEW" />
+                <category android:name="android.intent.category.DEFAULT" />
+                <category android:name="android.intent.category.BROWSABLE" />
+                <data android:scheme="http" android:host="*"
+                    android:pathPattern=".*\\.vpk" />
+                <data android:scheme="https" android:host="*"
+                    android:pathPattern=".*\\.vpk" />
+                <data android:scheme="content" android:host="*"
+                    android:pathPattern=".*\\.vpk"/>
+                <data android:scheme="file" android:host="*"
+                    android:pathPattern=".*\\.vpk" />
+                <data android:scheme="share" android:host="*"
+                    android:pathPattern=".*\\.vpk" />
+            </intent-filter -->
             <intent-filter>
                 <action android:name="android.intent.action.SEND" />
                 <category android:name="android.intent.category.DEFAULT" />
