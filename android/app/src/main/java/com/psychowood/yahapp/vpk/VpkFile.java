@@ -31,6 +31,7 @@ public class VpkFile {
     final static String TAG = "VpkFile";
 
     private String fileName;
+    private String filePath;
     private Map<String, SFODataValue> paramSfo;
     private Bitmap icon;
 
@@ -48,12 +49,12 @@ public class VpkFile {
 
     public VpkFile(String filePath) throws IOException {
 
+        this.filePath = filePath;
         try {
             filePath = URLDecoder.decode(filePath,"UTF-8");
         } catch (UnsupportedEncodingException e) {
             Log.e(TAG,"Error",e);
         }
-
         int cut = filePath.lastIndexOf('/');
         if (cut != -1) {
             this.fileName = filePath.substring(cut + 1);
@@ -131,6 +132,13 @@ public class VpkFile {
 
     public String getFileName() {
         return fileName;
+    }
+
+    public String getFilePath() {
+        return filePath;
+    }
+    public void setFilePath(String filePath) {
+        this.filePath = filePath;
     }
 
     public String getTitle() {
