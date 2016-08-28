@@ -31,6 +31,7 @@ import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
@@ -112,6 +113,7 @@ public class FtpClientActivity extends TextStatusActivityBase {
                                     }
 
                                     inputStream = getContentResolver().openInputStream(uri);
+
                                 } catch (FileNotFoundException e) {
                                     Log.e(TAG,"Cannot read shared uri " + uri,e);
                                 }
@@ -177,18 +179,42 @@ public class FtpClientActivity extends TextStatusActivityBase {
 
     private void _pushVpkFile(final String filePath, InputStream inputStream, String fileName) {
         VpkFile vpkFile = null;
+        File cacheFile = null;
         try {
             if (filePath != null) {
                 vpkFile = new VpkFile(filePath);
             } else if (inputStream != null) {
-                //TODO vpkFile = new VpkFile(inputStream,fileName);
-                throw new IOException("\"content:\" schema currently not supported. Please try to share the file with a file browser app.");
+
+                if (fileName != null) {
+                    cacheFile = new File(me.getCacheDir(), fileName);
+                } else {
+                    cacheFile = File.createTempFile("vpk","",me.getCacheDir());
+                }
+                FileOutputStream outputStream = new FileOutputStream(cacheFile);
+
+                int bytesRead = -1;
+                byte[] buffer = new byte[65536];
+                while ((bytesRead = inputStream.read(buffer)) != -1) {
+                    outputStream.write(buffer, 0, bytesRead);
+                }
+
+                outputStream.close();
+                inputStream.close();
+
+                vpkFile = new VpkFile(new FileInputStream(cacheFile),fileName);
+                if (fileName == null) {
+                    cacheFile.renameTo(new File(me.getCacheDir(), vpkFile.getTitle()));
+                }
+                vpkFile.setFilePath(cacheFile.getAbsolutePath());
             }
         } catch (IOException e) {
             Log.e(TAG, getString(R.string.error_vpk_cant_read) + filePath, e);
 
             final String message = getString(R.string.error_vpk_cant_read) + (e != null ? e.getLocalizedMessage() : e);
             showError(message);
+            if (cacheFile != null) {
+                cacheFile.delete();
+            }
         }
         if (vpkFile != null) {
             try {
@@ -243,7 +269,7 @@ public class FtpClientActivity extends TextStatusActivityBase {
 
                                 connectTo = connectTo + ":1337";
                                 textView.append("Connecting to " + connectTo  + "\n");
-                                async.execute(connectTo,filePath);
+                                async.execute(connectTo,vpk.getFilePath());
                                 alert.dismiss();
                             }
                         });
@@ -282,6 +308,8 @@ public class FtpClientActivity extends TextStatusActivityBase {
 
         PrintWriter pw;
         BufferedReader input;
+        String destFilePath;
+        final String DEST_DIR = "/ux0:/yahapp/";
 
         @Override
         protected void onPreExecute(){
@@ -302,7 +330,7 @@ public class FtpClientActivity extends TextStatusActivityBase {
                 if (address.length > 1) {
                     port = Integer.parseInt(address[1]);
                 }
-                final String filePath = params[1];
+                String filePath = params[1];
 
                 socket = new Socket();
                 InetSocketAddress socketAddress = new InetSocketAddress(addr, port);
@@ -322,7 +350,7 @@ public class FtpClientActivity extends TextStatusActivityBase {
 
                 writeAndRead("MKD yahapp"); //226 ok - 550 ko - ignoring error in case of already existing dir
 
-                writeAndExpect("CWD /ux0:/yahapp/","250"); //250
+                writeAndExpect("CWD " + DEST_DIR,"250"); //250
 
                 writeAndExpect("TYPE I","200"); //200
 
@@ -334,6 +362,8 @@ public class FtpClientActivity extends TextStatusActivityBase {
                 String fileName = filePath.replaceAll("^.*/([^/]*)$","$1");
 
                 write("STOR " + fileName);
+
+                destFilePath = DEST_DIR + fileName;
 
                 String[] pasvParts = pasvResp.split(",");
 
@@ -427,7 +457,7 @@ public class FtpClientActivity extends TextStatusActivityBase {
 
                         new AlertDialog.Builder(me)
                                 .setTitle(getString(R.string.enjoy))
-                                .setMessage(getString(R.string.menu_installvdk_completed))
+                                .setMessage(getString(R.string.menu_installvdk_completed) + destFilePath)
                                 .setPositiveButton(android.R.string.ok, new DialogInterface.OnClickListener() {
                                     public void onClick(DialogInterface dialog, int which) {
                                         onPause();

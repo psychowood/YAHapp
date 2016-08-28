@@ -35,6 +35,7 @@ public class MainActivity extends AppCompatActivity implements MainCardAdapter.M
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         main = this;
+        App.deleteCache(this);
         super.onCreate(savedInstanceState);
 
         final Context baseContext = getBaseContext();
