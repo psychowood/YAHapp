@@ -16,6 +16,11 @@ It's just the first commit: other features are coming soon, in the meanwhile if 
 This is my very first Android project, please be forgiving. I'll try to polish it while going on with the development.
 Also, I'm testing it on my Nexus w/ Android 6.0 and on the Android simulator: if you have an issue don't forget to give details on your device and androd version.
 
+## Permissions
+
+* android.permission.INTERNET - Network access (HENkaku server, FTP upload)
+* android.permission.READ_EXTERNAL_STORAGE - Needed to access files shared from the external storage (SD card, downloads...)
+
 # EXTRAS
 
 ## HENkaku Offline (Java port)
