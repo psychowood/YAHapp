@@ -5,7 +5,9 @@ What started as a simple java CLI port of HENkaku offline (still available [here
 Current features:
 
 * HENkaku server
+* Update embedded HENkaku payload directly from [HENkaku offline](https://github.com/henkaku/henkaku)
 * Upload a vpk directly to your PSVita (share the .vpk file with YAHapp)
+
 
 That's it! :) 
 It's just the first commit: other features are coming soon, in the meanwhile if you have any idea feel free to add an enhancement request in the [issues board](https://github.com/psychowood/YAHapp/issues).
