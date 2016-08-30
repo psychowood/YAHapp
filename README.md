@@ -1,6 +1,6 @@
 # YAHapp
 
-What started as a simple java CLI port of HENkaku offline (still available [here](https://github.com/psychowood/YAHapp/tree/offline-hosting)), is now trying to evolve in a PS Vita (HEHkaku enabled) companion app.
+What started as a simple java CLI port of HENkaku offline (still available [here](https://github.com/psychowood/YAHapp/tree/offline-hosting)), is now trying to evolve in a PS Vita (HEHkaku enabled) companion app for Android devices.
 
 Current features:
 
