@@ -25,12 +25,12 @@ public class HenkakuWebServer extends NanoHTTPD {
 
     private static final String STAGE1_PATH     = "stage1/";
     private static final String PAYLOAD_JS      = STAGE1_PATH + "payload.js";
-    private static final String LOADER_BIN      = STAGE1_PATH + "loader.rop.bin";
+    private static final String LOADER_BIN      = "loader.rop.bin";
 
     private static final String STAGE2_PATH     = "stage2/";
-    private static final String EXPLOIT_BIN     = STAGE2_PATH + "exploit.rop.bin";
+    private static final String EXPLOIT_BIN     = "exploit.rop.bin";
 
-    private static final String PKG_REFIX_PATH  = "pkg";
+    private static final String PKG_PREFIX_PATH = "host/pkg";
 
     private static final String LAST_FILE = "pkg/sce_sys/livearea/contents/template.xml";
 
@@ -183,7 +183,7 @@ public class HenkakuWebServer extends NanoHTTPD {
                         false
                 );
 
-                String packageUrl = "http://" + headers.get("host") + "/" + PKG_REFIX_PATH;
+                String packageUrl = "http://" + headers.get("host") + "/" + PKG_PREFIX_PATH;
                 ByteArrayOutputStream stage2Processed = new ByteArrayOutputStream();
                 HENprocess.writePkgUrl(
                         new ByteArrayInputStream(stage2ToProcess.toByteArray()),

@@ -1,3 +1,0 @@
-/*
-    This file will be generated at runtime from loader.rop.bin
-*/
