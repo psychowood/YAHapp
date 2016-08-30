@@ -71,10 +71,6 @@ public class FtpClientActivity extends TextStatusActivityBase {
 
     }
 
-    /**
-     * <p>Open calculator and load file (if one was passed).</p>
-     * @see Activity#onStart()
-     */
     @Override
     public void onStart ()
     {
