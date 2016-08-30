@@ -18,7 +18,7 @@ android {
         minSdkVersion 15
         targetSdkVersion 24
         versionCode code
-        versionName "0.0." + code.toString()
+        versionName "0.1." + code.toString()
     }
     buildTypes {
         release {
@@ -51,5 +51,8 @@ dependencies {
     compile 'com.android.support:cardview-v7:24.1.1'
     compile 'com.android.support.constraint:constraint-layout:1.0.0-alpha4'
     compile 'com.android.support:design:24.1.1'
+    compile 'org.kohsuke:github-api:1.77'
+    compile 'com.squareup.okhttp:okhttp:2.7.5'
+    compile 'com.squareup.okhttp:okhttp-urlconnection:2.7.5'
     testCompile 'junit:junit:4.12'
 }

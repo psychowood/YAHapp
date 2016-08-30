@@ -4,5 +4,7 @@
     tools:context="com.psychowood.myapplication.MainActivity">
     <item android:id="@+id/action_about" android:orderInCategory="100"
         android:title="@string/action_about" app:showAsAction="never" />
+    <item android:id="@+id/action_check_updates" android:orderInCategory="100"
+        android:title="@string/action_check_updates" app:showAsAction="never" />
 
 </menu>

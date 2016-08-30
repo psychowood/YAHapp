@@ -8,6 +8,7 @@ import android.util.Log;
 import android.view.WindowManager;
 
 import com.psychowood.henkaku.HenkakuWebServer;
+import com.psychowood.yahapp.storage.AssetsProxy;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -20,8 +21,6 @@ import fi.iki.elonen.NanoHTTPD;
 
 public class HenkakuWebServerActivity extends TextStatusActivityBase {
     private static final String TAG = "HNKWebServerActivity";
-
-    private static final String ASSETS_PREFIX      = "henkaku/";
 
     private HenkakuWebServer server;
 
@@ -58,9 +57,11 @@ public class HenkakuWebServerActivity extends TextStatusActivityBase {
         try {
             server = new HenkakuWebServer(new HenkakuWebServer.WebServerHandler() {
 
+                AssetsProxy proxy = new AssetsProxy(me);
+
                 @Override
                 public InputStream openResource(String resourceName) throws IOException {
-                    return getAssets().open(ASSETS_PREFIX+resourceName);
+                    return proxy.openAsset(AssetsProxy.HENKAKU_ASSETS_PREFIX,resourceName);
                 }
 
                 @Override
@@ -134,4 +135,5 @@ public class HenkakuWebServerActivity extends TextStatusActivityBase {
         if (server != null)
             server.stop();
     }
+
 }

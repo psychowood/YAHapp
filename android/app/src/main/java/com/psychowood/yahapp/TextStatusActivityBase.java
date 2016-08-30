@@ -57,11 +57,7 @@ public class TextStatusActivityBase extends AppCompatActivity {
             .setTitle(getString(R.string.error))
             .setIcon(android.R.drawable.ic_dialog_alert)
             .setMessage(message)
-            .setPositiveButton(android.R.string.ok, new DialogInterface.OnClickListener() {
-                public void onClick(DialogInterface dialog, int which) {
-                    finish();
-                }
-            })
+            .setPositiveButton(android.R.string.ok, null)
             .show();
     }
 
@@ -88,5 +84,12 @@ public class TextStatusActivityBase extends AppCompatActivity {
 
     protected SharedPreferences getPrefs() {
         return getSharedPreferences(App.APP_PREFS, MODE_PRIVATE);
+    }
+
+    protected SharedPreferences getPrefs(String suffix) {
+        if (suffix == null || suffix.length() == 0) {
+            throw new IllegalArgumentException("Preferences suffix cannot be null");
+        }
+        return getSharedPreferences(App.APP_PREFS + "-" + suffix, MODE_PRIVATE);
     }
 }

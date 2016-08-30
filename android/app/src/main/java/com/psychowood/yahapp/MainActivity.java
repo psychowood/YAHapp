@@ -23,6 +23,8 @@ import android.view.View;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.psychowood.yahapp.storage.AssetsProxy;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -35,7 +37,6 @@ public class MainActivity extends AppCompatActivity implements MainCardAdapter.M
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         main = this;
-        App.deleteCache(this);
         super.onCreate(savedInstanceState);
 
         final Context baseContext = getBaseContext();
@@ -109,6 +110,11 @@ public class MainActivity extends AppCompatActivity implements MainCardAdapter.M
                         .setPositiveButton(android.R.string.ok, null)
                         .setView(message)
                         .create().show();
+                break;
+            }
+            case R.id.action_check_updates: {
+                final Intent intent = new Intent(main, UpdateCheckerActivity.class);
+                this.startActivity(intent);
                 break;
             }
         }
