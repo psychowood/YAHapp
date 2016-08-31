@@ -10,7 +10,7 @@ Current features:
 
 
 That's it! :) 
-It's just the first commit: other features are coming soon, in the meanwhile if you have any idea feel free to add an enhancement request in the [issues board](https://github.com/psychowood/YAHapp/issues).
+It's just a little more than the very first commit: other features are coming soon, in the meanwhile if you have any ideas feel free to add an enhancement request in the [issues board](https://github.com/psychowood/YAHapp/issues).
 
 
 ## Disclaimer
