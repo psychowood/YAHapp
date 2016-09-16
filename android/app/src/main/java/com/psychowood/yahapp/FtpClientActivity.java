@@ -225,7 +225,7 @@ public class FtpClientActivity extends TextStatusActivityBase {
                 txtUrl.setText(psVitaIP);
 
                 final AlertDialog alert = new AlertDialog.Builder(me)
-                        .setTitle(getString(R.string.menu_installvdk_enter_psvita_ip))
+                        .setTitle(getString(R.string.menu_installvpk_enter_psvita_ip))
                         .setView(txtUrl)
                         .setPositiveButton(android.R.string.ok, null)
                         .create();
@@ -448,12 +448,12 @@ public class FtpClientActivity extends TextStatusActivityBase {
                     @Override
                     public void run() {
                         textView.append("\n");
-                        textView.append(getString(R.string.menu_installvdk_completed));
+                        textView.append(getString(R.string.menu_installvpk_completed));
                         textView.append("\n");
 
                         new AlertDialog.Builder(me)
                                 .setTitle(getString(R.string.enjoy))
-                                .setMessage(getString(R.string.menu_installvdk_completed) + destFilePath)
+                                .setMessage(getString(R.string.menu_installvpk_completed) + destFilePath)
                                 .setPositiveButton(android.R.string.ok, new DialogInterface.OnClickListener() {
                                     public void onClick(DialogInterface dialog, int which) {
                                         onPause();

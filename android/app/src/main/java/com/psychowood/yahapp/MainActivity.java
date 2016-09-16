@@ -67,7 +67,7 @@ public class MainActivity extends AppCompatActivity implements MainCardAdapter.M
     private void initializeCardList(){
         mainCards = new ArrayList<>();
         mainCards.add(new MainCard(R.string.menu_henkaku, getString(R.string.menu_henkaku), getString(R.string.menu_henkaku_action)));
-        mainCards.add(new MainCard(R.string.menu_installvdk, getString(R.string.menu_installvdk), getString(R.string.menu_installvdk_action)));
+        mainCards.add(new MainCard(R.string.menu_installvpk, getString(R.string.menu_installvpk), getString(R.string.menu_installvpk_action)));
     }
 
     @Override
@@ -134,11 +134,11 @@ public class MainActivity extends AppCompatActivity implements MainCardAdapter.M
             case R.string.menu_henkaku:
                 activityClass = HenkakuWebServerActivity.class;
                 break;
-            case R.string.menu_installvdk:
+            case R.string.menu_installvpk:
                 //activityClass = FtpClientActivity.class;
                 new AlertDialog.Builder(this)
-                        .setTitle(getString(R.string.menu_installvdk))
-                        .setMessage(getString(R.string.menu_installvdk_help))
+                        .setTitle(getString(R.string.menu_installvpk))
+                        .setMessage(getString(R.string.menu_installvpk_help))
                         .setPositiveButton(android.R.string.ok, null)
                         .show();
                 break;
