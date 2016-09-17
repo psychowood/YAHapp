@@ -118,6 +118,9 @@ public class FtpClientActivity extends TextStatusActivityBase {
                             }
                         }
                     }
+                } else {
+                    Toast.makeText(getApplicationContext(), R.string.error_sharing_before_jellybean, Toast.LENGTH_LONG).show();
+                    return;
                 }
 
             } else if (Intent.ACTION_VIEW.equalsIgnoreCase(action)) {
@@ -275,7 +278,8 @@ public class FtpClientActivity extends TextStatusActivityBase {
                 alert.show();
 
             } catch (Exception e) {
-                e.printStackTrace();
+                Log.e(TAG,"Exception", e);
+                showError(getString(R.string.error_unexpected) + ":" + e.getMessage());
             }
         }
     }
