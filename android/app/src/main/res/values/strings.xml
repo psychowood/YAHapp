@@ -39,6 +39,7 @@
     <string name="error_vpk_cant_read">"Cannot load vpk: "</string>
     <string name="error_permission_storage_denied">Permission to access storage denied</string>
     <string name="error_invalid_address">Ip address not valid</string>
+    <string name="error_invalid_port">Port must be between 1 and 65535</string>
     <string name="error_github_not_accessible">Cannot access GitHub</string>
     <string name="error_not_a_vpk_file">Not a vpk file</string>
     <string name="error_sharing_before_jellybean">Sharing supported only on Android > 4.1</string>
@@ -47,8 +48,17 @@
     <string name="error_unexpected">Unexpected error</string>
 
     <string name="question_retry">Do you want to retry?</string>
+    <string name="ok">OK</string>
     <string name="yes">Yes</string>
     <string name="no">Yes</string>
+    <string name="connecting_to">Connecting to</string>
+    <string name="test_connection">Test connection</string>
+    <string name="test_connection_to">Testing connection to</string>
+    <string name="test_connection_ok">Connection test successful</string>
+    <string name="connection_ko_noftp">Not an FTP server</string>
+    <string name="connection_ko_user">FTP user not accepted</string>
+    <string name="connection_ko_password">FTP password not accepted</string>
+    <string name="connection_ko_nouxpath">/ux0:/ path not found</string>
 
     <string name="download_starting">Starting download...</string>
     <string name="download_downloading">Downloading </string>

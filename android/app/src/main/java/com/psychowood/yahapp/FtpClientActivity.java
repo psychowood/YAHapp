@@ -265,10 +265,46 @@ public class FtpClientActivity extends TextStatusActivityBase {
                 final AlertDialog alert = new AlertDialog.Builder(me)
                         .setTitle(getString(R.string.menu_installvpk_enter_psvita_ip))
                         .setView(txtUrl)
-                        .setPositiveButton(android.R.string.ok, null)
+                        .setPositiveButton(R.string.ok, null)
+                        .setNeutralButton(R.string.test_connection,null)
                         .create();
 
                 alert.setOnShowListener(new DialogInterface.OnShowListener() {
+
+                    private String getIp() {
+                        String text = txtUrl.getText().toString();
+                        String connectTo,port;
+                        if (text.contains(":")) {
+                            String[] parts = text.split(":");
+                            connectTo = parts[0];
+                            port = parts[1];
+                        } else {
+                            connectTo = text;
+                            port = "1337";
+                        }
+
+                        try {
+                            if (connectTo == null || connectTo.length() < 1) {
+                                throw new Exception();
+                            }
+                            InetAddress.getByName(connectTo);
+                        } catch (Exception e) {
+                            Toast.makeText(getApplicationContext(), R.string.error_invalid_address, Toast.LENGTH_LONG).show();
+                            return null;
+                        }
+
+                        try {
+                            int portNum = Integer.parseInt(port);
+                            if (portNum < 1 || portNum > 65535) {
+                                throw new NumberFormatException("Invalid port");
+                            }
+                        } catch (NumberFormatException e) {
+                            Toast.makeText(getApplicationContext(), R.string.error_invalid_port, Toast.LENGTH_LONG).show();
+                            return null;
+                        }
+
+                        return connectTo + ":" + port;
+                    }
 
                     @Override
                     public void onShow(DialogInterface dialog) {
@@ -277,16 +313,8 @@ public class FtpClientActivity extends TextStatusActivityBase {
 
                             @Override
                             public void onClick(View view) {
-                                String connectTo = txtUrl.getText().toString();
-                                try {
-                                    if (connectTo == null || connectTo.length() < 1) {
-                                        throw new Exception();
-                                    }
-                                    InetAddress.getByName(connectTo);
-                                } catch (Exception e) {
-                                    Toast.makeText(getApplicationContext(), R.string.error_invalid_address, Toast.LENGTH_LONG).show();
-                                    return;
-                                }
+                                String connectTo = getIp();
+                                if (connectTo == null) return;
 
                                 SharedPreferences.Editor editor = settings.edit();
                                 editor.putString(App.PREF_PSVITAIP,connectTo);
@@ -301,10 +329,23 @@ public class FtpClientActivity extends TextStatusActivityBase {
 
                                 UploadTask async=new UploadTask();
 
-                                connectTo = connectTo + ":1337";
-                                textView.append("Connecting to " + connectTo  + "\n");
+                                textView.append(getString(R.string.connecting_to) + " " + connectTo  + "\n");
                                 async.execute(connectTo,vpk.getFilePath());
                                 alert.dismiss();
+                            }
+                        });
+                        b = alert.getButton(AlertDialog.BUTTON_NEUTRAL);
+                        b.setOnClickListener(new View.OnClickListener() {
+
+                            @Override
+                            public void onClick(View view) {
+                                String connectTo = getIp();
+                                if (connectTo == null) return;
+
+                                UploadTask async=new UploadTask();
+
+                                textView.append(getString(R.string.test_connection_to) + " " + connectTo  + "\n");
+                                async.execute(connectTo);
                             }
                         });
                     }
@@ -346,6 +387,8 @@ public class FtpClientActivity extends TextStatusActivityBase {
         String destFilePath;
         final String DEST_DIR = "/ux0:/yahapp/";
 
+        boolean isTest = false;
+
         @Override
         protected void onPreExecute(){
             super.onPreExecute();
@@ -361,12 +404,13 @@ public class FtpClientActivity extends TextStatusActivityBase {
             try {
                 final String[] address = params[0].split(":");
                 final InetAddress addr = InetAddress.getByName(address[0]);
+
+                isTest = (params.length < 2);
+
                 int port = 21;
                 if (address.length > 1) {
                     port = Integer.parseInt(address[1]);
                 }
-                String filePath = params[1];
-
                 socket = new Socket();
                 InetSocketAddress socketAddress = new InetSocketAddress(addr, port);
                 socket.setSoTimeout(5000);
@@ -375,59 +419,79 @@ public class FtpClientActivity extends TextStatusActivityBase {
                 input = new BufferedReader(new InputStreamReader(socket.getInputStream()));
                 pw = new PrintWriter(socket.getOutputStream());
 
-                expect(read(),"220");
-
-                writeAndExpect("USER yahapp","331"); //331
-
-                writeAndExpect("PASS yahapp","230");//230
-
-                writeAndExpect("CWD /ux0:/","250");//250
-
-                writeAndRead("MKD yahapp"); //226 ok - 550 ko - ignoring error in case of already existing dir
-
-                writeAndExpect("CWD " + DEST_DIR,"250"); //250
-
-                writeAndExpect("TYPE I","200"); //200
-
-                String pasvResp = writeAndRead("PASV"); //227
-                expect(pasvResp,"227");
-
-                pasvResp = pasvResp.replaceAll("^.*\\((.*)\\).*$","$1");
-
-                String fileName = filePath.replaceAll("^.*/([^/]*)$","$1");
-
-                write("STOR " + fileName);
-
-                destFilePath = DEST_DIR + fileName;
-
-                String[] pasvParts = pasvResp.split(",");
-
-                InetAddress pasvIp = Inet4Address.getByName(pasvParts[0] + "." + pasvParts[1] + "." + pasvParts[2] + "." + pasvParts[3]);
-                int pasvPort = Integer.parseInt(pasvParts[4]) * 256 + Integer.parseInt(pasvParts[5]);
-
-                uploadSocket = new Socket(pasvIp, pasvPort);
-
-                BufferedOutputStream fileOs = new BufferedOutputStream(uploadSocket.getOutputStream());
-
-                expect(read(),"150");
-                File file = new File(filePath);
-                long size = file.length();
-                InputStream fileIs = new FileInputStream(file);
-                byte[] buf = new byte[8192];
-                int read = 0;
-                long sent = 0;
-                while ((read = fileIs.read(buf)) != -1) {
-                    fileOs.write(buf, 0, read);
-                    sent += read;
-                    long progress = (sent * 100)/ size;
-                    showMessage("Sent " + progress + "%");
+                try {
+                    expect(read(),"220");
+                } catch (IOException e) {
+                    throw new IOException(getString(R.string.connection_ko_noftp));
                 }
-                fileOs.flush();
-                fileOs.close();
-                fileIs.close();
 
-                expect(read(),"226");
+                try {
+                    writeAndExpect("USER yahapp","331"); //331
+                } catch (IOException e) {
+                    throw new IOException(getString(R.string.connection_ko_user));
+                }
 
+                try {
+                    writeAndExpect("PASS yahapp","230");//230
+                } catch (IOException e) {
+                    throw new IOException(getString(R.string.connection_ko_password));
+                }
+
+                try {
+                    writeAndExpect("CWD /ux0:/","250");//250
+                } catch (IOException e) {
+                    throw new IOException(getString(R.string.connection_ko_nouxpath));
+                }
+
+                if (!isTest) {
+
+                    String filePath = params[1];
+
+                    writeAndRead("MKD yahapp"); //226 ok - 550 ko - ignoring error in case of already existing dir
+
+                    writeAndExpect("CWD " + DEST_DIR, "250"); //250
+
+                    writeAndExpect("TYPE I", "200"); //200
+
+                    String pasvResp = writeAndRead("PASV"); //227
+                    expect(pasvResp, "227");
+
+                    pasvResp = pasvResp.replaceAll("^.*\\((.*)\\).*$", "$1");
+
+                    String fileName = filePath.replaceAll("^.*/([^/]*)$", "$1");
+
+                    write("STOR " + fileName);
+
+                    destFilePath = DEST_DIR + fileName;
+
+                    String[] pasvParts = pasvResp.split(",");
+
+                    InetAddress pasvIp = Inet4Address.getByName(pasvParts[0] + "." + pasvParts[1] + "." + pasvParts[2] + "." + pasvParts[3]);
+                    int pasvPort = Integer.parseInt(pasvParts[4]) * 256 + Integer.parseInt(pasvParts[5]);
+
+                    uploadSocket = new Socket(pasvIp, pasvPort);
+
+                    BufferedOutputStream fileOs = new BufferedOutputStream(uploadSocket.getOutputStream());
+
+                    expect(read(), "150");
+                    File file = new File(filePath);
+                    long size = file.length();
+                    InputStream fileIs = new FileInputStream(file);
+                    byte[] buf = new byte[8192];
+                    int read = 0;
+                    long sent = 0;
+                    while ((read = fileIs.read(buf)) != -1) {
+                        fileOs.write(buf, 0, read);
+                        sent += read;
+                        long progress = (sent * 100) / size;
+                        showMessage("Sent " + progress + "%");
+                    }
+                    fileOs.flush();
+                    fileOs.close();
+                    fileIs.close();
+
+                    expect(read(), "226");
+                }
                 return new String("OK");
             } catch (IOException e){
                 String t="Failure : " + e.getLocalizedMessage();
@@ -481,27 +545,35 @@ public class FtpClientActivity extends TextStatusActivityBase {
             if (!"OK".equalsIgnoreCase(str)) {
                 messageView.setVisibility(View.INVISIBLE);
                 imageView.setVisibility(View.INVISIBLE);
-                showError(str);
+                if (!isTest) {
+                    showError(str);
+                } else {
+                    Toast.makeText(getApplicationContext(), str, Toast.LENGTH_LONG).show();
+                }
             } else {
-                handler.post(new Runnable() {
-                    @Override
-                    public void run() {
-                        textView.append("\n");
-                        textView.append(getString(R.string.menu_installvpk_completed));
-                        textView.append("\n");
+                if (!isTest) {
+                    handler.post(new Runnable() {
+                        @Override
+                        public void run() {
+                            textView.append("\n");
+                            textView.append(getString(R.string.menu_installvpk_completed));
+                            textView.append("\n");
 
-                        new AlertDialog.Builder(me)
-                                .setTitle(getString(R.string.enjoy))
-                                .setMessage(getString(R.string.menu_installvpk_completed) + destFilePath)
-                                .setPositiveButton(android.R.string.ok, new DialogInterface.OnClickListener() {
-                                    public void onClick(DialogInterface dialog, int which) {
-                                        onPause();
-                                        finish();
-                                    }
-                                })
-                                .show();
-                    }
-                });
+                            new AlertDialog.Builder(me)
+                                    .setTitle(getString(R.string.enjoy))
+                                    .setMessage(getString(R.string.menu_installvpk_completed) + destFilePath)
+                                    .setPositiveButton(android.R.string.ok, new DialogInterface.OnClickListener() {
+                                        public void onClick(DialogInterface dialog, int which) {
+                                            onPause();
+                                            finish();
+                                        }
+                                    })
+                                    .show();
+                        }
+                    });
+                } else {
+                    Toast.makeText(getApplicationContext(), R.string.test_connection_ok, Toast.LENGTH_SHORT).show();
+                }
             }
         }
     }
