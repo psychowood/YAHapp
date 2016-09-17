@@ -1,8 +1,8 @@
 package com.psychowood.yahapp;
 
 import android.Manifest;
-import android.app.Activity;
 import android.content.ClipData;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -13,6 +13,7 @@ import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
+import android.os.Handler;
 import android.provider.OpenableColumns;
 import android.support.v4.app.ActivityCompat;
 import android.support.v7.app.AlertDialog;
@@ -43,6 +44,7 @@ import java.net.Socket;
 
 public class FtpClientActivity extends TextStatusActivityBase {
     private static final int PUSH_VPK_FILE = 1;
+    public static final String INTENTEXTRA_DOWNLOAD_VPK_URL = "INTENTEXTRA_DOWNLOAD_VPK_URL";
     private static String[] PERMISSIONS_STORAGE = {
             Manifest.permission.READ_EXTERNAL_STORAGE
     };
@@ -54,6 +56,7 @@ public class FtpClientActivity extends TextStatusActivityBase {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        fabBack.setVisibility(View.INVISIBLE);
         getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
     }
 
@@ -89,7 +92,11 @@ public class FtpClientActivity extends TextStatusActivityBase {
             String fileName = null;
 
             final String action = intent.getAction();
-            if (Intent.ACTION_SEND.equalsIgnoreCase(action)) {
+            final String downloadVpkFrom = getIntent().getStringExtra(INTENTEXTRA_DOWNLOAD_VPK_URL);
+
+            if (downloadVpkFrom != null) {
+                filePath = downloadVpkFrom;
+            } else if (Intent.ACTION_SEND.equalsIgnoreCase(action)) {
                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN) {
                     final ClipData clipData = intent.getClipData();
                     if (clipData != null) {
@@ -139,25 +146,53 @@ public class FtpClientActivity extends TextStatusActivityBase {
 
                     Log.d(TAG, "> Open file  : " + filePath);
 
-                } // if
+                }
             }
             if (vpkFile == null) {
                 if (filePath != null) {
-                    // Check if we have read or write permission
-                    int readPermission = ActivityCompat.checkSelfPermission(this, Manifest.permission.READ_EXTERNAL_STORAGE);
+                    if (filePath.toLowerCase().matches("^http://.*|^https://")) {
+                        final Handler handler = new Handler();
+                        new DownloadFileWithProgressAsyncTask(new DownloadFileWithProgressAsyncTask.DownloadHandler() {
+                            @Override
+                            public Context getContext() {
+                                return me;
+                            }
 
-                    if (readPermission != PackageManager.PERMISSION_GRANTED) {
-                        // We don't have permission so prompt the user
-                        filePathToPush = filePath;
-                        ActivityCompat.requestPermissions(
-                                this,
-                                PERMISSIONS_STORAGE,
-                                PUSH_VPK_FILE
-                        );
+                            @Override
+                            public Handler getHandler() {
+                                return handler;
+                            }
+
+                            @Override
+                            public void onDownloadCompleted(File tempFile) {
+                                if (tempFile != null) {
+                                    Log.i(TAG, "Downloaded " + tempFile.getName());
+                                    pushVpkFile(tempFile.getAbsolutePath());
+                                }
+                            }
+
+                            @Override
+                            public void showError(String message) {
+                                showError(message);
+                                finish();
+                            }
+                        }).execute(filePath);
                     } else {
-                        pushVpkFile(filePath);
-                    }
+                        // Check if we have read or write permission
+                        int readPermission = ActivityCompat.checkSelfPermission(this, Manifest.permission.READ_EXTERNAL_STORAGE);
 
+                        if (readPermission != PackageManager.PERMISSION_GRANTED) {
+                            // We don't have permission so prompt the user
+                            filePathToPush = filePath;
+                            ActivityCompat.requestPermissions(
+                                    this,
+                                    PERMISSIONS_STORAGE,
+                                    PUSH_VPK_FILE
+                            );
+                        } else {
+                            pushVpkFile(filePath);
+                        }
+                    }
                 } else if (inputStream != null) {
                     pushVpkFile(inputStream,fileName);
                 }
