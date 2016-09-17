@@ -2,7 +2,6 @@ package com.psychowood.yahapp;
 
 import android.app.Activity;
 import android.content.Context;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.os.Bundle;
@@ -23,7 +22,8 @@ import android.view.View;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.psychowood.yahapp.storage.AssetsProxy;
+import com.thefinestartist.finestwebview.FinestWebView;
+import com.thefinestartist.finestwebview.listeners.WebViewListener;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -68,6 +68,7 @@ public class MainActivity extends AppCompatActivity implements MainCardAdapter.M
         mainCards = new ArrayList<>();
         mainCards.add(new MainCard(R.string.menu_henkaku, getString(R.string.menu_henkaku), getString(R.string.menu_henkaku_action)));
         mainCards.add(new MainCard(R.string.menu_installvpk, getString(R.string.menu_installvpk), getString(R.string.menu_installvpk_action)));
+        mainCards.add(new MainCard(R.string.menu_browsevpkmirror, getString(R.string.menu_browsevpkmirror), getString(R.string.menu_browsevpkmirror_action)/*, R.mipmap.vpkmirror_logo, 0x403ec4 */));
     }
 
     @Override
@@ -96,14 +97,14 @@ public class MainActivity extends AppCompatActivity implements MainCardAdapter.M
                 message.setText(s);
                 message.setMovementMethod(LinkMovementMethod.getInstance());
 
-                final String packageName = getApplicationContext().getPackageName();
-                String version;
+                String version = null;
                 try {
-                    version = getPackageManager().getPackageInfo(packageName,0).versionName;
+                    version = App.getPackageInfo(this).versionName;
                 } catch (PackageManager.NameNotFoundException e) {
-                    Log.e(TAG,"Cannot get package name",e);
+                    Log.e(TAG,"Cannot get version info",e);
                     version = "";
                 }
+
                 new AlertDialog.Builder(this)
                         .setTitle(getString(R.string.about_title) + " " + version)
                         .setCancelable(true)
@@ -122,7 +123,7 @@ public class MainActivity extends AppCompatActivity implements MainCardAdapter.M
     }
 
     @Override
-    public void doMainAction(View v, int position, Context context) {
+    public void doMainAction(View v, int position, final Context context) {
         MainCard card = mainCards.get(position);
         Log.d(TAG,"clicked " + position);
 
@@ -141,6 +142,48 @@ public class MainActivity extends AppCompatActivity implements MainCardAdapter.M
                         .setMessage(getString(R.string.menu_installvpk_help))
                         .setPositiveButton(android.R.string.ok, null)
                         .show();
+                break;
+            case R.string.menu_browsevpkmirror:
+                new FinestWebView.Builder(this)
+                        /*
+                        .webViewJavaScriptEnabled(true)
+                        .webViewAllowContentAccess(true)
+                        .webViewAllowFileAccess(true)
+                        .webViewAllowFileAccessFromFileURLs(true)
+                        .webViewAllowUniversalAccessFromFileURLs(true)
+                        .webViewJavaScriptCanOpenWindowsAutomatically(true)
+                        .webViewSupportMultipleWindows(true)
+                        */
+                        .backPressToClose(true)
+                        .setWebViewListener(new WebViewListener() {
+                            @Override
+                            public void onPageStarted(String url) {
+                                super.onPageStarted(url);
+                            }
+
+                            @Override
+                            public void onPageFinished(String url) {
+                                super.onPageFinished(url);
+                            }
+
+                            @Override
+                            public void onLoadResource(String url) {
+                                super.onLoadResource(url);
+                            }
+
+                            @Override
+                            public void onDownloadStart(String url, String userAgent, String contentDisposition, String mimeType, long contentLength) {
+                                if (!url.toLowerCase().endsWith(".vpk")) {
+                                    Toast.makeText(context, R.string.error_not_a_vpk_file, Toast.LENGTH_SHORT).show();
+                                } else {
+                                    final Intent intent = new Intent(main, FtpClientActivity.class);
+                                    intent.putExtra(FtpClientActivity.INTENTEXTRA_DOWNLOAD_VPK_URL, url);
+                                    context.startActivity(intent);
+                                }
+                                //super.onDownloadStart(url, userAgent, contentDisposition, mimeType, contentLength);
+                            }
+                        })
+                        .show(R.string.url_vpkmirror);
                 break;
             default:
                 activityClass = null;
