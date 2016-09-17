@@ -24,6 +24,7 @@ public class TextStatusActivityBase extends AppCompatActivity {
     protected ImageView imageView;
     protected Handler handler;
     protected Activity me;
+    protected FloatingActionButton fabBack;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -42,8 +43,8 @@ public class TextStatusActivityBase extends AppCompatActivity {
 
         handler = new Handler();
 
-        FloatingActionButton fab_bak = (FloatingActionButton) findViewById(R.id.fab_back);
-        fab_bak.setOnClickListener(new View.OnClickListener() {
+        fabBack = (FloatingActionButton) findViewById(R.id.fab_back);
+        fabBack.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 onPause();
@@ -53,11 +54,15 @@ public class TextStatusActivityBase extends AppCompatActivity {
     }
 
     protected AlertDialog showError(String message) {
+        return showError(message,null);
+    }
+
+    protected AlertDialog showError(String message, DialogInterface.OnClickListener onClickListener) {
         return new AlertDialog.Builder(me)
             .setTitle(getString(R.string.error))
             .setIcon(android.R.drawable.ic_dialog_alert)
             .setMessage(message)
-            .setPositiveButton(android.R.string.ok, null)
+            .setPositiveButton(android.R.string.ok, onClickListener)
             .show();
     }
 
