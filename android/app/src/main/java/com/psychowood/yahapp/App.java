@@ -1,7 +1,8 @@
 package com.psychowood.yahapp;
 
 import android.content.Context;
-import android.content.SharedPreferences;
+import android.content.pm.PackageInfo;
+import android.content.pm.PackageManager;
 
 import java.io.File;
 
@@ -35,5 +36,10 @@ public class App {
         } else {
             return false;
         }
+    }
+
+    public static PackageInfo getPackageInfo(Context context) throws PackageManager.NameNotFoundException {
+        final String packageName = context.getApplicationContext().getPackageName();
+        return context.getPackageManager().getPackageInfo(packageName,0);
     }
 }
