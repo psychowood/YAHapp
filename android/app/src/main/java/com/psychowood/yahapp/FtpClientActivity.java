@@ -334,8 +334,8 @@ public class FtpClientActivity extends TextStatusActivityBase {
 
                 socket = new Socket();
                 InetSocketAddress socketAddress = new InetSocketAddress(addr, port);
-                socket.setSoTimeout(10000);
-                socket.connect(socketAddress);
+                socket.setSoTimeout(5000);
+                socket.connect(socketAddress,5000);
 
                 input = new BufferedReader(new InputStreamReader(socket.getInputStream()));
                 pw = new PrintWriter(socket.getOutputStream());
