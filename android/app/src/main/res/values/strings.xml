@@ -32,10 +32,28 @@
     <string name="menu_installvpk_enter_psvita_ip">Enter PSVita ip:</string>
     <string name="menu_installvpk_help">To upload a .vpk file to VitaShell\'s ftp server, you need to share a .vpk file with YAHapp using the share action from a file manager app.</string>
 
+    <string name="menu_browsevpkmirror">Browse VPKMirror</string>
+    <string name="menu_browsevpkmirror_action">Open</string>
+
     <string name="error">Error!</string>
     <string name="error_vpk_cant_read">"Cannot load vpk: "</string>
     <string name="error_permission_storage_denied">Permission to access storage denied</string>
     <string name="error_invalid_address">Ip address not valid</string>
     <string name="error_github_not_accessible">Cannot access GitHub</string>
+    <string name="error_not_a_vpk_file">Not a vpk file</string>
+    <string name="error_sharing_before_jellybean">Sharing supported only on Android > 4.1</string>
+    <string name="error_cant_download">Error downloading file</string>
+    <string name="error_missing_url">Url missing...</string>
+    <string name="error_unexpected">Unexpected error</string>
 
+    <string name="question_retry">Do you want to retry?</string>
+    <string name="yes">Yes</string>
+    <string name="no">Yes</string>
+
+    <string name="download_starting">Starting download...</string>
+    <string name="download_downloading">Downloading </string>
+    <string name="download_downloaded">Downloaded </string>
+    <string name="download_completed">Done!</string>
+
+    <string name="url_vpkmirror">http://vpkmirror.com</string>
 </resources>
