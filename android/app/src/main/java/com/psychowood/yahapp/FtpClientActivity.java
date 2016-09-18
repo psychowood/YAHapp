@@ -150,7 +150,7 @@ public class FtpClientActivity extends TextStatusActivityBase {
             }
             if (vpkFile == null) {
                 if (filePath != null) {
-                    if (filePath.toLowerCase().matches("^http://.*|^https://")) {
+                    if (filePath.toLowerCase().matches("^(http|https)://.*")) {
                         final Handler handler = new Handler();
                         new DownloadFileWithProgressAsyncTask(new DownloadFileWithProgressAsyncTask.DownloadHandler() {
                             @Override

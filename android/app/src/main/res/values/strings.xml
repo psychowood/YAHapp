@@ -30,10 +30,10 @@
     <string name="menu_installvpk_action">Upload .vpk file</string>
     <string name="menu_installvpk_completed">Upload completed to\n</string>
     <string name="menu_installvpk_enter_psvita_ip">Enter PSVita ip:</string>
-    <string name="menu_installvpk_help">To upload a .vpk file to VitaShell\'s ftp server, you need to share a .vpk file with YAHapp using the share action from a file manager app.</string>
+    <string name="menu_installvpk_help">To upload a .vpk file to VitaShell\'s ftp server, you need to open a .vpk link or share a .vpk file with YAHapp using the share action from a file manager app.</string>
 
-    <string name="menu_browsevpkmirror">Browse VPKMirror</string>
-    <string name="menu_browsevpkmirror_action">Open</string>
+    <string name="menu_browsevpkmirror">VPKMirror</string>
+    <string name="menu_browsevpkmirror_action">Browse</string>
 
     <string name="error">Error!</string>
     <string name="error_vpk_cant_read">"Cannot load vpk: "</string>
