@@ -4,7 +4,7 @@ What started as a simple java CLI port of HENkaku offline (still available [here
 
 Current features:
 
-* HENkaku server
+* HENkaku server with VitaShell 1.1 embedded instead of MolecularShell
 * Update embedded HENkaku payload directly from [HENkaku offline](https://github.com/henkaku/henkaku)
 * Upload a vpk directly to your PSVita (share the .vpk file with YAHapp or open a .vpk link somewhere)
 * Browse vpkmirror.com in app and install vpk directly
