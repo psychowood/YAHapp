@@ -75,14 +75,24 @@ public class DownloadFileWithProgressAsyncTask extends AsyncTask<String, Void, F
             response = client.newCall(request).execute();
             final String fileName;
             String fileNameTmp = filePath.replaceAll("^.*/([^/]*)$","$1");
+
+            InputStream is = response.body().byteStream();
+            final Headers headers = response.headers();
+
+            String contentDisposition = headers.get("Content-Disposition");
+            if (contentDisposition != null) {
+                final String searchStr = "filename=";
+                int nameIndex = contentDisposition.indexOf(searchStr);
+                if (nameIndex != -1) {
+                    fileNameTmp = contentDisposition.substring(nameIndex+searchStr.length());
+                }
+            }
+
             if (fileNameTmp.contains("?")) {
                 fileName = fileNameTmp.split("\\?")[0];
             } else {
                 fileName = fileNameTmp;
             }
-
-            InputStream is = response.body().byteStream();
-            final Headers headers = response.headers();
 
             final Integer contentLength;
             Integer contentLengthTmp;
