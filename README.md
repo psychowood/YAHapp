@@ -6,11 +6,11 @@ Current features:
 
 * HENkaku server
 * Update embedded HENkaku payload directly from [HENkaku offline](https://github.com/henkaku/henkaku)
-* Upload a vpk directly to your PSVita (share the .vpk file with YAHapp)
-
+* Upload a vpk directly to your PSVita (share the .vpk file with YAHapp or open a .vpk link somewhere)
+* Browse vpkmirror.com in app and install vpk directly
 
 That's it! :) 
-It's just a little more than the very first commit: other features are coming soon, in the meanwhile if you have any ideas feel free to add an enhancement request in the [issues board](https://github.com/psychowood/YAHapp/issues).
+Other features are coming soon, in the meanwhile if you have any ideas feel free to add an enhancement request in the [issues board](https://github.com/psychowood/YAHapp/issues).
 
 
 ## Disclaimer
